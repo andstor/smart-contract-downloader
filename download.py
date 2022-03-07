@@ -89,6 +89,8 @@ if __name__ == '__main__':
     contracts_df = contracts_df.astype({
         'contract_name': "string",
         'contract_address': "string",
+        'language': "string",
+        'format': "string",
         'source_code': "string",
         'abi': object,
         'compiler_version': "string",
@@ -108,4 +110,4 @@ if __name__ == '__main__':
     datasets = contracts_ds.train_test_split(test_size=0.05, seed=1)
 
     datasets['train'].to_parquet('data/all/train.parquet')
-    datasets['test'].to_parquet('data/all/test.parquet')
+    datasets['test'].to_parquet('data/all/dev.parquet')
