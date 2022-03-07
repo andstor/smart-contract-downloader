@@ -27,9 +27,11 @@ def process_source_code(contract):
     source_code = ""
     language = ""
     # Check for Solidity Standard Json-Input format
-    if contract['source_code'][:2] == "{{":
-        # Fix Json by removing extranous curly brace
-        source_code = contract['source_code'][1:-1]
+    if contract['source_code'][:1] == "{":
+        source_code = contract['source_code']
+        if contract['source_code'][:2] == "{{":
+            # Fix Json by removing extranous curly brace
+            source_code = source_code[1:-1]
         code_format = "JSON"
         language = "Solidity"
     elif "vyper" in contract['compiler_version']:

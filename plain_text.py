@@ -4,7 +4,7 @@ from split_files import split_files
 if __name__ == '__main__':
 
     train_ds = Dataset.from_parquet('data/all/train.parquet')
-    test_ds = Dataset.from_parquet('data/all/test.parquet')
+    test_ds = Dataset.from_parquet('data/all/dev.parquet')
     contracts_df = concatenate_datasets([train_ds, test_ds]).to_pandas()
     files_df = split_files(contracts_df)
 
@@ -27,4 +27,4 @@ if __name__ == '__main__':
     datasets = contracts_ds.train_test_split(test_size=0.05, seed=1)
 
     datasets['train'].to_parquet('data/plain_text/train.parquet')
-    datasets['test'].to_parquet('data/plain_text/test.parquet')
+    datasets['test'].to_parquet('data/plain_text/dev.parquet')
