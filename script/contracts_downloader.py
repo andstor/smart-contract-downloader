@@ -12,7 +12,6 @@ from tqdm import tqdm
 
 class ContractsDownloadManager:
     def __init__(self, token, addresses="all_contracts.csv", output="data", shard=1, index=0, skip=0, position=0, **kwargs):
-        print("token: " + token)
         self.token = token
         self.addresses_path = addresses
         self.output_dir = output
@@ -79,6 +78,7 @@ class ContractsDownloadManager:
                 contract_path = Path(self.output_dir, address_path + '.json')
                 pbar.update(1) # update progress bar
                 meta = {}
+                meta["token"] = self.token
                 meta["index"] = str(count) + "/" + str(adress_count)
                 if os.path.exists(contract_path):
                     pbar.set_postfix(meta)
