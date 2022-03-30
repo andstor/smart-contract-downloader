@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Download contracts from Etherscan.io.')
     parser.add_argument('-t', '--tokens', metavar='tokens', type=str,
-                        default="api_keys.csv", help='JSON file with Etherscan.io access tokens.')
+                        default="api_keys.json", help='JSON file with Etherscan.io access tokens.')
     parser.add_argument('-a', '--addresses', metavar='addresses', type=str, required=False,
                         default="all_contracts.csv", help='CSV file containing a list of contract addresses to download.')
     parser.add_argument('-o', '--output', metavar='output', type=str, required=False,
