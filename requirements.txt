@@ -4,4 +4,4 @@ fastparquet==0.8.0
 pandas==1.4.1
 py-etherscan-api==0.8.0
 pyarrow==7.0.0
-tqdm @ git+https://github.com/tqdm/tqdm.git@939518215359c1a5000c06ab3bc525a71e1a8a99
+tqdm @ git+https://github.com/tqdm/tqdm.git@refs/pull/1054/head
