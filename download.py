@@ -12,7 +12,7 @@ API_KEY = "WZVVCEUJASXNTWZV81CIZGHE7KE6G5TF9K"
 
 
 @backoff.on_exception(backoff.expo,
-                      requests.exceptions.RequestException,
+                      (requests.exceptions.RequestException, Exception),
                       max_tries=8)
 def get_code(address):
     url ="https://api.etherscan.io/api?module=contract&action=getsourcecode&address=" + address + "&apikey=" + API_KEY;
@@ -20,6 +20,8 @@ def get_code(address):
         if response.status_code != 200:
             raise Exception('API response: {}'.format(response.status_code))
         data = json.loads(response.text)
+        if data['status'] == '0':
+            raise Exception('API error: {}'.format(data['result']))
         return data['result'][0]
 
 def process_source_code(contract):
@@ -27,19 +29,21 @@ def process_source_code(contract):
     source_code = ""
     language = ""
     # Check for Solidity Standard Json-Input format
-    if contract['source_code'][:1] == "{":
-        source_code = contract['source_code']
-        if contract['source_code'][:2] == "{{":
+    #print(contract)
+    contract['SourceCode']
+    if contract['SourceCode'][:1] == "{":
+        source_code = contract['SourceCode']
+        if contract['SourceCode'][:2] == "{{":
             # Fix Json by removing extranous curly brace
             source_code = source_code[1:-1]
         code_format = "JSON"
         language = "Solidity"
-    elif "vyper" in contract['compiler_version']:
-        source_code = contract['source_code']
+    elif "vyper" in contract['CompilerVersion']:
+        source_code = contract['SourceCode']
         code_format = "Vyper"
         language = "Vyper"
     else:
-        source_code = contract['source_code']
+        source_code = contract['SourceCode']
         code_format = "Solidity"
         language = "Solidity"
     return source_code, language, code_format
@@ -58,7 +62,7 @@ if __name__ == '__main__':
 
         # Get contract code from Etherscan.io
         contract = get_code(row['ContractAddress'])
-        source_code, language, code_format = process_source_code(data)
+        source_code, language, code_format = process_source_code(contract)
 
         data = {
                 'contract_address': row['ContractAddress'],

@@ -1,0 +1,63 @@
+from concurrent.futures import ThreadPoolExecutor, wait
+from threading import Semaphore
+from contracts_downloader import ContractsDownloadManager
+
+def worker(pos, sem, args):
+    with sem:
+        downloader = ContractsDownloadManager(**vars(args), position=pos)
+        downloader.download()
+
+if __name__ == '__main__':
+    import argparse
+    from pathlib import Path
+    import sys
+    import json
+    from itertools import cycle, repeat, chain
+    import warnings
+
+    parser = argparse.ArgumentParser(
+        description='Get source code of contracts')
+
+    parser = argparse.ArgumentParser(
+        description='Download contracts from Etherscan.io.')
+    parser.add_argument('-t', '--tokens', metavar='JSON file with api keys.',
+                        type=str, default="api_keys.csv", help='Etherscan.io access token.')
+    parser.add_argument('-a', '--addresses', metavar='addresses', type=str, required=False,
+                        default="all_contracts.csv", help='CSV file containing a list of contract addresses to download.')
+    parser.add_argument('-o', '--output', metavar='output', type=str, required=False,
+                        default="data", help='The path where the output should be stored.')
+    parser.add_argument('--shard', metavar='shard', type=int, required=True,
+                        default=1, help='The number of shards to split data in.')
+    parser.add_argument('--concurrency', metavar='concurrency', type=int, required=False,
+                        default=-1, help='The concurrency level to use. -1 means max.')
+    parser.add_argument('--token-limit', metavar='token_limit', type=int, required=False,
+                        default=1, help='The maximum number of concurrent use of an access token.')
+    args = parser.parse_args()
+
+    with open('api_keys.json') as fp:
+        api_keys = json.load(fp)["keys"]
+    tokens = cycle(list(chain.from_iterable(repeat(x, args.token_limit) for x in api_keys)))
+    
+    if args.concurrency == -1:
+        args.concurrency = len(api_keys) * args.token_limit
+
+    if args.concurrency > args.token_limit*len(api_keys):
+        warnings.warn("The concurrency level is higher than the number of tokens. Setting concurrency to " + str(args.token_limit*len(api_keys)))
+        args.concurrency = args.token_limit*len(api_keys)
+
+    try:
+        with ThreadPoolExecutor() as executor:
+            sem = Semaphore(args.concurrency)
+            futures = []
+            key_index = 0
+            for pos in range(args.shard):
+                args.index = pos
+                args.token = next(tokens)
+                future = executor.submit(worker, pos, sem, args)
+                #print(f'{future.result()}')
+                futures.append(future)
+            wait(futures)
+    except Exception as e:
+        print(e)
+
+        sys.exit(1)
