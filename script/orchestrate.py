@@ -20,8 +20,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description='Download contracts from Etherscan.io.')
-    parser.add_argument('-t', '--tokens', metavar='JSON file with api keys.',
-                        type=str, default="api_keys.csv", help='Etherscan.io access token.')
+    parser.add_argument('-t', '--tokens', metavar='tokens', type=str,
+                        default="api_keys.csv", help='JSON file with Etherscan.io access tokens.')
     parser.add_argument('-a', '--addresses', metavar='addresses', type=str, required=False,
                         default="all_contracts.csv", help='CSV file containing a list of contract addresses to download.')
     parser.add_argument('-o', '--output', metavar='output', type=str, required=False,
@@ -34,7 +34,7 @@ if __name__ == '__main__':
                         default=1, help='The maximum number of concurrent use of an access token.')
     args = parser.parse_args()
 
-    with open('api_keys.json') as fp:
+    with open(args.tokens) as fp:
         api_keys = json.load(fp)["keys"]
     tokens = cycle(list(chain.from_iterable(repeat(x, args.token_limit) for x in api_keys)))
     
