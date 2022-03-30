@@ -46,7 +46,7 @@ if __name__ == '__main__':
         args.concurrency = args.token_limit*len(api_keys)
 
     try:
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=args.concurrency) as executor:
             sem = Semaphore(args.concurrency)
             futures = []
             key_index = 0
