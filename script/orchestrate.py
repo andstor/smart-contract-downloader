@@ -33,20 +33,20 @@ if __name__ == '__main__':
                         default=0, help='The index from where to start downloading. Zero indexed.')
     parser.add_argument('--concurrency', metavar='concurrency', type=int, required=False,
                         default=-1, help='The concurrency level to use. -1 means max.')
-    parser.add_argument('--token-limit', metavar='token_limit', type=int, required=False,
+    parser.add_argument('--token-multiplier', metavar='token_multiplier', type=int, required=False,
                         default=1, help='The maximum number of concurrent use of an access token.')
     args = parser.parse_args()
 
     with open(args.tokens) as fp:
         api_keys = json.load(fp)["keys"]
-    tokens = cycle(list(chain.from_iterable(repeat(x, args.token_limit) for x in api_keys)))
+    tokens = cycle(list(chain.from_iterable(repeat(x, args.token_multiplier) for x in api_keys)))
     
     if args.concurrency == -1:
-        args.concurrency = len(api_keys) * args.token_limit
+        args.concurrency = len(api_keys) * args.token_multiplier
 
-    if args.concurrency > args.token_limit*len(api_keys):
-        warnings.warn("The concurrency level is higher than the number of tokens. Setting concurrency to " + str(args.token_limit*len(api_keys)))
-        args.concurrency = args.token_limit*len(api_keys)
+    if args.concurrency > args.token_multiplier*len(api_keys):
+        warnings.warn("The concurrency level is higher than the number of tokens. Setting concurrency to " + str(args.token_multiplier*len(api_keys)))
+        args.concurrency = args.token_multiplier*len(api_keys)
 
     try:
         with ThreadPoolExecutor(max_workers=args.concurrency) as executor:
