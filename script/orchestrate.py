@@ -29,6 +29,8 @@ if __name__ == '__main__':
                         default="data", help='The path where the output should be stored.')
     parser.add_argument('--shard', metavar='shard', type=int, required=True,
                         default=1, help='The number of shards to split data in.')
+    parser.add_argument('--start-index', metavar='start_index', type=int, required=False,
+                        default=0, help='The index from where to start downloading. Zero indexed.')
     parser.add_argument('--concurrency', metavar='concurrency', type=int, required=False,
                         default=-1, help='The concurrency level to use. -1 means max.')
     parser.add_argument('--token-limit', metavar='token_limit', type=int, required=False,
@@ -50,10 +52,9 @@ if __name__ == '__main__':
         with ThreadPoolExecutor(max_workers=args.concurrency) as executor:
             sem = Semaphore(args.concurrency)
             futures = []
-            key_index = 0
-            for pos in range(args.shard):
+            for pos in range(args.shard - args.start_index):
                 args_copy = Namespace(**vars(args))
-                args_copy.index = pos
+                args_copy.index = pos + args.start_index
                 args_copy.token = next(tokens)
                 future = executor.submit(worker, pos, sem, args_copy)
                 #print(f'{future.result()}')
