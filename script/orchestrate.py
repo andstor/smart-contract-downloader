@@ -1,3 +1,4 @@
+from argparse import Namespace
 from concurrent.futures import ThreadPoolExecutor, wait
 from threading import Semaphore
 from contracts_downloader import ContractsDownloadManager
@@ -51,9 +52,10 @@ if __name__ == '__main__':
             futures = []
             key_index = 0
             for pos in range(args.shard):
-                args.index = pos
-                args.token = next(tokens)
-                future = executor.submit(worker, pos, sem, args)
+                args_copy = Namespace(**vars(args))
+                args_copy.index = pos
+                args_copy.token = next(tokens)
+                future = executor.submit(worker, pos, sem, args_copy)
                 #print(f'{future.result()}')
                 futures.append(future)
             wait(futures)
