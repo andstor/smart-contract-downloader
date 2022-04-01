@@ -1,7 +1,5 @@
 from operator import index
 import os
-from turtle import st
-from datasets import DownloadManager
 from etherscan.contracts import Contract
 from etherscan.client import EmptyResponse, BadRequest, ConnectionRefused
 import backoff
@@ -11,6 +9,7 @@ import argparse
 from pathlib import Path
 import math
 from tqdm import tqdm
+import csv
 
 
 class ContractsDownloadManager:
@@ -60,33 +59,27 @@ class ContractsDownloadManager:
 
         if (start > adress_count):
             raise ValueError("Start out of range")
-
+        
         with open(self.addresses_path) as fp:
-            line = fp.readline()
+            reader = csv.reader(fp)
             pbar = tqdm(total=batch, position=self.position,
-                        desc="Shard " + str(self.index+1) + "/" + str(self.shard))
-            while line:
+                        desc="Shard " + str(self.index+1) + "/" + str(self.shard), initial=self.skip)
+            for i, line in enumerate(reader):
                 if (count >= end):
                     break
-                address_path = line.split(',')[0]
-                if address_path == 'address':
-                    line = fp.readline()
-                    continue
                 count += 1
                 if start > count:
-                    line = fp.readline()
                     continue
+                address_path = line[0]
                 if address_path in not_valid:
-                    line = fp.readline()
                     continue
+                pbar.update(1)  # update progress bar    
                 contract_path = Path(self.output_dir, address_path + '.json')
-                pbar.update(1)  # update progress bar
                 meta = {}
                 meta["token"] = self.token
                 meta["index"] = str(count) + "/" + str(adress_count)
                 if os.path.exists(contract_path):
                     pbar.set_postfix(meta)
-                    line = fp.readline()
                     continue
                 count_effective += 1
                 meta["empty"] = str(round(empty*100/count_effective, 2)) + "%"
@@ -103,7 +96,6 @@ class ContractsDownloadManager:
                     with open('not_valid.json', 'w') as fd:
                         json.dump(not_valid, fd)
                     print(identifier)
-                line = fp.readline()
     
 
     @backoff.on_exception(backoff.expo,
