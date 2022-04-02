@@ -104,6 +104,8 @@ def process_files(path, output_dir, parquet_size):
     main_bar = tqdm(scandir(path), total=filescount, position=0, desc="Processing")
     parquet_bar = tqdm(scandir(path), total=parquet_size, position=1, desc="Part " + str(part))
     for i, entry in enumerate(main_bar):
+        if not entry.name.startswith('0x'):
+            continue
         contract = process_file(entry.path)
         if contract is None:
             empty_files += 1
