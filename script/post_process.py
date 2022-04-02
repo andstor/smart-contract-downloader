@@ -8,6 +8,8 @@ from pathlib import Path
 from tqdm import tqdm
 from sys import getsizeof
 import math
+import gc
+
 # Precomputing files count
 
 
@@ -144,6 +146,7 @@ def process_files(path, output_dir, parquet_size):
             contracts = []
             part += 1
             parquet_bar.reset()
+            gc.collect()
         contracts_count += 1
 
     if len(contracts) > 0:
