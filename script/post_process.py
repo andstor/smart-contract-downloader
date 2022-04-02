@@ -9,6 +9,7 @@ from tqdm import tqdm
 from sys import getsizeof
 import math
 import gc
+from json.decoder import JSONDecodeError
 
 # Precomputing files count
 
@@ -51,8 +52,12 @@ def process_source_code(contract):
 def process_file(path):
     """Process a single file."""
     path = Path(path)
-    with open(path) as f:
-        data = json.load(f)
+    try:
+        with open(path, 'r') as f:
+            data = json.load(f)
+    except JSONDecodeError as e:
+        print("Can't decode file: " + str(path))
+        return None
 
     if data["SourceCode"] == "":
         return None
