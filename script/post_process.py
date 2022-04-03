@@ -10,7 +10,7 @@ from sys import getsizeof
 import math
 import gc
 from json.decoder import JSONDecodeError
-
+import tarfile,os
 # Precomputing files count
 
 
@@ -49,6 +49,17 @@ def process_source_code(contract):
     return source_code, language, code_format
 
 
+def process_tar_member(tar, member):
+    try:
+        f=tar.extractfile(member)
+        data = f.read().decode("utf-8")
+        data = json.loads(data)
+    except:
+        print("Can't decode file: " + str(member.name))
+        return None
+    address = Path(member.path).stem
+    return process_contract_data(address, data)
+
 def process_file(path):
     """Process a single file."""
     path = Path(path)
@@ -58,6 +69,12 @@ def process_file(path):
     except JSONDecodeError as e:
         print("Can't decode file: " + str(path))
         return None
+    
+    address = path.stem
+    return process_contract_data(address, data)
+
+
+def process_contract_data(address, data):
 
     if data["SourceCode"] == "":
         return None
@@ -68,7 +85,7 @@ def process_file(path):
     if code_format == "JSON":
         return None
 
-    address = path.stem
+    address = address
 
     contract = {
         'contract_name': data['ContractName'],
@@ -101,19 +118,37 @@ def process_files(path, output_dir, parquet_size):
     contracts_count = 0
     part = 0
     empty_files = 0
-    filescount = count_files(path)
+    filescount = 0
 
     meta = {
         "contracts": 0,
         "empty": 0,
     }
 
-    main_bar = tqdm(scandir(path), total=filescount, position=0, desc="Processing")
-    parquet_bar = tqdm(scandir(path), total=parquet_size, position=1, desc="Part " + str(part))
+    filesitter = None
+    is_tar = False
+    
+    if tarfile.is_tarfile(path):
+        is_tar = True
+        tar = tarfile.open(path)
+        filescount = sum(1 for member in tar if member.isfile())
+        print("Tar file contains " + str(filescount) + " files")
+        filesitter = tar
+    else:
+        filescount = count_files(path)
+        filesitter = scandir(path)
+
+    main_bar = tqdm(filesitter, total=filescount, position=0, desc="Processing")
+    parquet_bar = tqdm(total=parquet_size, position=1, desc="Part " + str(part))
+
     for i, entry in enumerate(main_bar):
-        if not entry.name.startswith('0x'):
+        if not entry.name.endswith('.json'):
             continue
-        contract = process_file(entry.path)
+        if is_tar:
+            contract = process_tar_member(tar, entry)
+        else:
+            contract = process_file(entry.path)
+
         if contract is None:
             empty_files += 1
             meta["empty"] = str(empty_files)
@@ -162,9 +197,10 @@ def process_files(path, output_dir, parquet_size):
 
     main_bar.close()
     parquet_bar.close()
-
+    if is_tar:
+        tar.close()
     print("-------------------------------------------------------")
-    print("Processed files" + str(filescount))
+    print("Processed files: " + str(filescount))
     print("Contracts: " + str(contracts_count))
     print("Empty files: " + str(empty_files))
     print("Empty percentage: " + str(round(empty_files*100/(i+1), 2)) + "%")
