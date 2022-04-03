@@ -128,15 +128,19 @@ def process_files(path, output_dir, parquet_size):
     filesitter = None
     is_tar = False
     
-    if tarfile.is_tarfile(path):
+
+    if path.is_dir():
+        filescount = count_files(path)
+        filesitter = scandir(path)
+    elif tarfile.is_tarfile(path):
         is_tar = True
         tar = tarfile.open(path)
         filescount = sum(1 for member in tar if member.isfile())
         print("Tar file contains " + str(filescount) + " files")
         filesitter = tar
     else:
-        filescount = count_files(path)
-        filesitter = scandir(path)
+        print("Unknown file type: " + str(path))
+        return  
 
     main_bar = tqdm(filesitter, total=filescount, position=0, desc="Processing")
     parquet_bar = tqdm(total=parquet_size, position=1, desc="Part " + str(part))
