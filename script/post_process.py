@@ -10,7 +10,10 @@ from sys import getsizeof
 import math
 import gc
 from json.decoder import JSONDecodeError
-import tarfile,os
+import tarfile
+import os
+
+from contract import Contract
 # Precomputing files count
 
 
@@ -24,41 +27,16 @@ def count_files(path, hidden=False):
     return filescount
 
 
-def process_source_code(contract):
-    code_format = ""
-    source_code = ""
-    language = ""
-    # Check for Solidity Standard Json-Input format
-    # print(contract)
-    contract['SourceCode']
-    if contract['SourceCode'][:1] == "{":
-        source_code = contract['SourceCode']
-        if contract['SourceCode'][:2] == "{{":
-            # Fix Json by removing extranous curly brace
-            source_code = source_code[1:-1]
-        code_format = "JSON"
-        language = "Solidity"
-    elif "vyper" in contract['CompilerVersion']:
-        source_code = contract['SourceCode']
-        code_format = "Vyper"
-        language = "Vyper"
-    else:
-        source_code = contract['SourceCode']
-        code_format = "Solidity"
-        language = "Solidity"
-    return source_code, language, code_format
-
-
 def process_tar_member(tar, member):
     try:
-        f=tar.extractfile(member)
+        f = tar.extractfile(member)
         data = f.read().decode("utf-8")
         data = json.loads(data)
     except:
         print("Can't decode file: " + str(member.name))
         return None
-    address = Path(member.path).stem
-    return process_contract_data(address, data)
+    return data
+
 
 def process_file(path):
     """Process a single file."""
@@ -69,41 +47,7 @@ def process_file(path):
     except JSONDecodeError as e:
         print("Can't decode file: " + str(path))
         return None
-    
-    address = path.stem
-    return process_contract_data(address, data)
-
-
-def process_contract_data(address, data):
-
-    if data["SourceCode"] == "":
-        return None
-
-    source_code, language, code_format = process_source_code(data)
-
-    # TODO: extract JSON contract metadata sourcecode
-    if code_format == "JSON":
-        return None
-
-    address = address
-
-    contract = {
-        'contract_name': data['ContractName'],
-        'contract_address': address,
-        'language': language,
-        'source_code': source_code,
-        'abi': data['ABI'],
-        'compiler_version': data['CompilerVersion'],
-        'optimization_used': data['OptimizationUsed'],
-        'runs': data['Runs'],
-        'constructor_arguments': data['ConstructorArguments'],
-        'evm_version': data['EVMVersion'],
-        'library': data['Library'],
-        'license_type': data['LicenseType'],
-        'proxy': data['Proxy'],
-        'implementation': data['Implementation'],
-        'swarm_source': data['SwarmSource']}
-    return contract
+    return data
 
 
 def process_files(path, output_dir, parquet_size):
@@ -127,7 +71,6 @@ def process_files(path, output_dir, parquet_size):
 
     filesitter = None
     is_tar = False
-    
 
     if path.is_dir():
         filescount = count_files(path)
@@ -140,33 +83,58 @@ def process_files(path, output_dir, parquet_size):
         filesitter = tar
     else:
         print("Unknown file type: " + str(path))
-        return  
+        return
 
-    main_bar = tqdm(filesitter, total=filescount, position=0, desc="Processing")
-    parquet_bar = tqdm(total=parquet_size, position=1, desc="Part " + str(part))
+    main_bar = tqdm(filesitter, total=filescount,
+                    position=0, desc="Processing")
+    parquet_bar = tqdm(total=parquet_size, position=1,
+                       desc="Part " + str(part))
 
     for i, entry in enumerate(main_bar):
         if not entry.name.endswith('.json'):
             continue
-        if is_tar:
-            contract = process_tar_member(tar, entry)
-        else:
-            contract = process_file(entry.path)
 
-        if contract is None:
+        if is_tar:
+            data = process_tar_member(tar, entry)
+        else:
+            data = process_file(entry.path)
+
+        if data is None or data["SourceCode"] == "":
             empty_files += 1
             meta["empty"] = str(empty_files)
             main_bar.set_postfix(meta)
             continue
-        meta["empty"] = str(empty_files)
 
+        meta["empty"] = str(empty_files)
         meta["contracts"] = str(contracts_count)
+
+        address = Path(entry.path).stem
+        contract = Contract.from_etherscan_dict(address=address, dict=data)
+        contract = contract.normalize().to_dict(
+            labels={
+                'contract_name',
+                'contract_address',
+                'language',
+                'source_code',
+                'abi',
+                'compiler_version',
+                'optimization_used',
+                'runs',
+                'constructor_arguments',
+                'evm_version',
+                'library',
+                'license_type',
+                'proxy',
+                'implementation',
+                'swarm_source'
+            })
         contracts.append(contract)
+
         main_bar.set_postfix(meta)
         parquet_bar.update(1)
         parquet_bar.set_description("Part " + str(part))
 
-        if contracts_count % parquet_size == 0 and contracts_count != 0:
+        if contracts_count % (parquet_size-1) == 0 and contracts_count != 0:
             contracts_df = pd.DataFrame(contracts)
             contracts_df = contracts_df.astype({
                 'contract_name': "string",
@@ -176,7 +144,7 @@ def process_files(path, output_dir, parquet_size):
                 'abi': "string",
                 'compiler_version': "string",
                 'optimization_used': bool,
-                'runs': int,
+                'runs': "Int64",
                 'constructor_arguments': "string",
                 'evm_version': "string",
                 'library': "string",
@@ -208,7 +176,9 @@ def process_files(path, output_dir, parquet_size):
     print("Contracts: " + str(contracts_count))
     print("Empty files: " + str(empty_files))
     print("Empty percentage: " + str(round(empty_files*100/(i+1), 2)) + "%")
+    print("Parquet files written: " + str(part + 1))
     print("-------------------------------------------------------")
+
 
 if __name__ == '__main__':
     import argparse
