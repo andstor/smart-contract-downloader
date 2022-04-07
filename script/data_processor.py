@@ -159,7 +159,7 @@ if __name__ == '__main__':
         if not os.path.exists(dataset_dir):
             os.makedirs(dataset_dir, exist_ok=True)
         if args.clean:
-            for file in Path(dataset_dir, dataset_name).glob("*.parquet"):
+            for file in Path(dataset_dir).glob("*.parquet"):
                 file.unlink()
 
         if dataset_name == "all":
