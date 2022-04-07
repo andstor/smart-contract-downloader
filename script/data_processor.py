@@ -155,14 +155,14 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     for dataset_name in args.datasets:
+        dataset_dir = os.path.join(args.output_dir, dataset_name)
+        if not os.path.exists(dataset_dir):
+            os.makedirs(dataset_dir, exist_ok=True)
+        if args.clean:
+            for file in Path(dataset_dir, dataset_name).glob("*.parquet"):
+                file.unlink()
 
         if dataset_name == "all":
-            if not os.path.exists(os.path.join(args.output_dir, dataset_name)):
-                os.makedirs(args.output_dir)
-            if args.clean:
-                for file in Path(args.output_dir, dataset_name).glob("*.parquet"):
-                    file.unlink()
-
             dp = DataProcessor(args.source, args.chunk_size).all()
             for index, dataset in enumerate(dp):
                 contracts_ds = Dataset.from_pandas(dataset)
@@ -170,12 +170,6 @@ if __name__ == '__main__':
                 contracts_ds.to_parquet(path)
 
         elif dataset_name == "plain_text":
-            if not os.path.exists(os.path.join(args.output_dir, dataset_name)):
-                os.makedirs(args.output_dir)
-            if args.clean:
-                for file in Path(args.output_dir, dataset_name).glob("*.parquet"):
-                    file.unlink()
-
             dp = DataProcessor(args.source, args.chunk_size).plain_text()
             for index, dataset in enumerate(dp):
                 contracts_ds = Dataset.from_pandas(dataset)
