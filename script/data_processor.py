@@ -157,7 +157,7 @@ if __name__ == '__main__':
     for dataset_name in args.datasets:
 
         if dataset_name == "all":
-            if not os.path.exists(args.output_dir):
+            if not os.path.exists(os.path.join(args.output_dir, dataset_name)):
                 os.makedirs(args.output_dir)
             if args.clean:
                 for file in Path(args.output_dir, dataset_name).glob("*.parquet"):
@@ -170,7 +170,7 @@ if __name__ == '__main__':
                 contracts_ds.to_parquet(path)
 
         elif dataset_name == "plain_text":
-            if not os.path.exists(args.output_dir):
+            if not os.path.exists(os.path.join(args.output_dir, dataset_name)):
                 os.makedirs(args.output_dir)
             if args.clean:
                 for file in Path(args.output_dir, dataset_name).glob("*.parquet"):
