@@ -184,16 +184,13 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(
-        description='Get source code of contracts')
-
-    parser = argparse.ArgumentParser(
-        description='Download contracts from Etherscan.io.')
+        description='Convert raw JSON files to parquet files.')
     parser.add_argument('-s', '--source', metavar='source', type=str, required=False,
                         default="data", help='Path to directory with files to process.')
     parser.add_argument('-o', '--output', metavar='output', type=str, required=False,
-                        default="output", help='The path where the output should be stored.')
+                        default="parquet", help='The path where the output should be stored.')
     parser.add_argument('--parquet-size', metavar='parquet_size', type=int, required=False,
-                        default=10000, help='The number of contracts to store in each parquet file.')
+                        default=50000, help='The number of contracts to store in each parquet file.')
     args = parser.parse_args()
 
     process_files(args.source, args.output, args.parquet_size)

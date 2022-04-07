@@ -118,7 +118,7 @@ if __name__ == "__main__":
     parser.add_argument('-a', '--addresses', metavar='addresses', type=Path, required=False,
                         default="all_contracts.csv", help='CSV file containing a list of contract addresses to download.')
     parser.add_argument('-o', '--output', metavar='output', type=Path, required=False,
-                        default="data", help='The path where the output should be stored.')
+                        default="downloads", help='The path where the output should be stored.')
     parser.add_argument('--shard', metavar='shard', type=int, required=False,
                         default=1, help='The number of shards to split data in.')
     parser.add_argument('--index', metavar='index', type=int, required='--shard' in sys.argv,
