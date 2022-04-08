@@ -77,7 +77,7 @@ class DataProcessor():
             df = self._explode_files(batch)  # Potentially very large batch
             df = self._uniqify(df)
             df = df.rename(columns={'source_code': 'text'})
-            df = df[['text', 'language']].reset_index()
+            df = df[['text', 'language']]
             chunk = self.chunk(df)
             if chunk is not None:
                 yield chunk
@@ -147,7 +147,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output-dir', metavar='output_dir', type=str, required=False,
                         default="data", help='The directory where the output should be stored.')
     parser.add_argument('--chunk-size', metavar='chunk-size', type=int, required=False,
-                        default=50000, help='The number of contracts to store in each data file.')
+                        default=25000, help='The number of contracts to store in each data file.')
     parser.add_argument('--datasets', metavar='datasets', type=str, nargs=2, required=False,
                         default=["all", "plain_text"], help='The datasets to make.')
     parser.add_argument('--clean', metavar='clean', type=bool, required=False,
