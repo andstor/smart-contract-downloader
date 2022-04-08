@@ -41,14 +41,14 @@ Download contracts from Etherscan.io.
 optional arguments:
   -h, --help            show this help message and exit
   -t token, --token token
-                        Etherscan.io access token.
+                        Etherscan.io API key.
   -a addresses, --addresses addresses
                         CSV file containing a list of contract addresses to download.
   -o output, --output output
-                        The path where the output should be stored.
-  --shard shard         The number of shards to split data in.
-  --index index         The index of the shard to process. Zero indexed.
-  --skip skip           The lines to skip reading from in the address list.
+                        the path where the output should be stored.
+  --shard shard         the number of shards to split data in.
+  --index index         the index of the shard to process. Zero indexed.
+  --skip skip           the lines to skip reading from in the address list.
 ```
 
 ### Example
