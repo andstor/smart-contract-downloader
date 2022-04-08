@@ -1,5 +1,6 @@
 import re
 import json
+from json.decoder import JSONDecodeError
 
 
 class ContractFileHandler():
@@ -55,7 +56,12 @@ class ContractFileHandler():
 
     def _extract_multi_files(self, data):
         files = []
-        record_json = json.loads(data)
+        try:
+            record_json = json.loads(data)
+        except JSONDecodeError as e:
+            print("Can't decode JSON:" + str(e.msg))
+            return []
+
         for file_path, source in record_json.items():
             source_code = source['content']
             files.append({'file_path': file_path, 'source_code': source_code})
@@ -64,7 +70,12 @@ class ContractFileHandler():
 
     def _extract_json_files(self, data):
         files = []
-        record_json = json.loads(data)
+        try:
+            record_json = json.loads(data)
+        except JSONDecodeError as e:
+            print("Can't decode JSON:" + str(e.msg))
+            return []
+
         files_code = record_json['sources']
         for file_path, source in files_code.items():
             source_code = source['content']
