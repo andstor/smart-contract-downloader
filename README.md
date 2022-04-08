@@ -13,8 +13,8 @@ Install the Python deependencies defined in the requirements.txt.
 pip install -r requirements.txt
 ```
 
-### Etherscan.io API access
-In order to gain access to the Etherscan.io API, you will need an Etherscan.io [acount](https://docs.etherscan.io/getting-started/creating-an-account) and generate [API key(s)](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics). If using [orchestration](#orchestration), the API key(s) needs to be added to the `api_keys.json` file.
+### Etherscan API access
+In order to gain access to the Etherscan.io API, you will need an Etherscan [acount](https://docs.etherscan.io/getting-started/creating-an-account) and generate [API key(s)](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics). If using [orchestration](#orchestration), the API key(s) needs to be added to the `api_keys.json` file.
 
 ### Collect contract addresses
 To download the smart contracts from Etherscan, a collection of the wanted contract addresses is needed (CSV file).
@@ -102,4 +102,3 @@ This will use a maximum of two concurrent threads for downloading. If number of 
 Copyright © [André Storhaug](https://github.com/andstor)
 
 smart-contract-downloader is licensed under the [MIT License](https://github.com/andstor/smart-contract-downloader/blob/main/LICENSE).  
-
