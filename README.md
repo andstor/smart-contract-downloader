@@ -8,7 +8,7 @@ A complete dataset of verified smart contracts is available at 🤗 [Hugging Fac
 
 ## Requirements
 ### Dependencies
-Install the Python deependencies defined in the requirements.txt.
+Install the Python dependencies defined in the requirements.txt.
 ```shell
 pip install -r requirements.txt
 ```
