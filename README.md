@@ -96,3 +96,10 @@ To limit the number of threads, just pass the `--n-threads` argument.
 python script/contracts_downloader.py --n-threads 2 --shard 5 --addresses contract_addresses.csv
 ```
 This will use a maximum of two concurrent threads for downloading. If number of API keys is > `n-threads` each new shard/thread will pick the next key from the list.
+
+## License
+
+Copyright © [André Storhaug](https://github.com/andstor)
+
+smart-contract-downloader is licensed under the [MIT License](https://github.com/andstor/smart-contract-downloader/blob/main/LICENSE).  
+
