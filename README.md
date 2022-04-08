@@ -31,6 +31,8 @@ SELECT contracts.address, COUNT(1) AS tx_count
 ```
 
 ## Contracts downloader
+The `contracts_downloader.py` script will ttry to download all the verified smart contract data from the available on [etherscan.io](https://etherscan.io), whos address is in the address list (CSV file). Each contract address will producee a JSON file with the name of the address, conttaining the data provided by Etherscan. Addresses that has not yet been verified on Etherscan will still produce an JSON file with mostly empty data fields.
+
 ### Usage
 
 ```script
@@ -56,7 +58,7 @@ To download the smart contracts whose address is in `contract_addresses.csv`, ru
 ```
 python script/contracts_downloader.py -token <API_KEY> --addresses contract_addresses.csv
 ```
-The contracts will be saved to `./output`.
+The contracts will be saved to `./output` as default.
 
 ## Orchestration
 In order to speed up the downloading process, an orchestration script is provided. This enables multithreaded downloading from Etherscan, using multiple API keys. In order for this to be effective, the contract address list needs to be split into multiple logical shards.
