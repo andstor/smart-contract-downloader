@@ -5,7 +5,7 @@ import json
 import copy
 
 from contract_file_handler import ContractFileHandler
-
+from utils import str2bool
 
 
 class Contract():
@@ -72,16 +72,17 @@ class Contract():
             'source_code': source_code,
             'abi': abi,
             'compiler_version': compiler_version,
-            'optimization_used': bool(optimization_used),
+            'optimization_used': str2bool(optimization_used),
             'runs': int(runs) if runs else None,
             'constructor_arguments': constructor_arguments,
             'evm_version': evm_version,
             'library': library,
             'license_type': license_type,
-            'proxy': bool(proxy),
+            'proxy': str2bool(proxy),
             'implementation': implementation,
             'swarm_source': swarm_source,
-        }
+        }        
+
         self.code_format = None
         self.files = []
         if self._data["source_code"]:

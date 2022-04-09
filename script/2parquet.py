@@ -45,7 +45,7 @@ def process_file(path):
         with open(path, 'r') as f:
             data = json.load(f)
     except JSONDecodeError as e:
-        print("Can't decode file: " + str(path))
+        print("Can't decode file: " + str(path) + ": " + str(e))
         return None
     return data
 
@@ -184,13 +184,13 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(
-        description='Convert raw JSON files to parquet files.')
+        description='Convert contract JSON data files to parquet files.')
     parser.add_argument('-s', '--source', metavar='source', type=str, required=False,
-                        default="data", help='Path to directory with files to process.')
+                        default="data", help='path to directory with files to process.')
     parser.add_argument('-o', '--output', metavar='output', type=str, required=False,
-                        default="parquet", help='The path where the output should be stored.')
+                        default="parquet", help='the path where the output should be stored.')
     parser.add_argument('--parquet-size', metavar='parquet_size', type=int, required=False,
-                        default=50000, help='The number of contracts to store in each parquet file.')
+                        default=25000, help='the number of contracts to store in each parquet file.')
     args = parser.parse_args()
 
     process_files(args.source, args.output, args.parquet_size)

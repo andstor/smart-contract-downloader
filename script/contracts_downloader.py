@@ -114,17 +114,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Download contracts from Etherscan.io.')
     parser.add_argument('-t', '--token', metavar='token',
-                        type=str, help='Etherscan.io access token.')
+                        type=str, help='Etherscan.io API key.')
     parser.add_argument('-a', '--addresses', metavar='addresses', type=Path, required=False,
-                        default="all_contracts.csv", help='CSV file containing a list of contract addresses to download.')
+                        default="contract_addresses.csv", help='CSV file containing a list of contract addresses to download.')
     parser.add_argument('-o', '--output', metavar='output', type=Path, required=False,
-                        default="downloads", help='The path where the output should be stored.')
+                        default="output", help='the path where the output should be stored.')
     parser.add_argument('--shard', metavar='shard', type=int, required=False,
-                        default=1, help='The number of shards to split data in.')
+                        default=1, help='the number of shards to split data in.')
     parser.add_argument('--index', metavar='index', type=int, required='--shard' in sys.argv,
-                        default=0, help='The index of the shard to process. Zero indexed.')
+                        default=0, help='the index of the shard to process. Zero indexed.')
     parser.add_argument('--skip', metavar='skip', type=int, required=False,
-                        default=0, help='The lines to skip reading from in the address list.')
+                        default=0, help='the lines to skip reading from in the address list.')
     args = parser.parse_args()
 
     token = args.token
