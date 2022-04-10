@@ -31,7 +31,7 @@ SELECT contracts.address, COUNT(1) AS tx_count
 ```
 
 ## Contracts downloader
-The `contracts_downloader.py` script will ttry to download all the verified smart contract data from the available on [etherscan.io](https://etherscan.io), whos address is in the address list (CSV file). Each contract address will producee a JSON file with the name of the address, conttaining the data provided by Etherscan. Addresses that has not yet been verified on Etherscan will still produce an JSON file with mostly empty data fields.
+The `contracts_downloader.py` script will try to download all the verified smart contract data from the available on [etherscan.io](https://etherscan.io), whos address is in the address list (CSV file). Each contract address will producee a JSON file with the name of the address, conttaining the data provided by Etherscan. Addresses that has not yet been verified on Etherscan will still produce an JSON file with mostly empty data fields.
 
 ### Usage
 
