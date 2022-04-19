@@ -17,7 +17,7 @@ pip install -r requirements.txt
 In order to gain access to the Etherscan.io API, you will need an Etherscan [acount](https://docs.etherscan.io/getting-started/creating-an-account) and generate [API key(s)](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics). If using [orchestration](#orchestration), the API key(s) needs to be added to the `api_keys.json` file.
 
 ### Collect contract addresses
-To download the smart contracts from Etherscan, a collection of the wanted contract addresses is needed (CSV file).
+To download the smart contracts from Etherscan, a collection of the wanted contract addresses is needed (CSV file). See example [contract_addresses.csv](https://huggingface.co/datasets/andstor/smart_contracts/blob/main/contract_addresses.csv).
 
 To collect such addresses, one can for example make use of Google BigQuery. The following query will select all the contracts that have at least one transaction.
 
