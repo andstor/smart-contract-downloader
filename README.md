@@ -4,7 +4,7 @@
 
 This is a tool for downloading verified Smart Contract data from [etherscan.io](https://etherscan.io).
 
-A complete dataset of verified smart contracts is available at 🤗 [Hugging Face](https://huggingface.co/datasets/andstor/smart_contracts), downloaded :black_joker: 1st of April 2022.  
+A complete dataset of verified smart contracts will be available at 🤗 [Hugging Face](https://huggingface.co/datasets/andstor/smart_contracts), downloaded :black_joker: 1st of April 2022.  
 Further processing scripts are available at [verified-smart-contracts](https://github.com/andstor/verified-smart-contracts).
 
 ## Requirements
